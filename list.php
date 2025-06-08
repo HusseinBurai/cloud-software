@@ -3,10 +3,34 @@
 $conn = new mysqli("localhost", "root", "", "cloud_db");
 $conn->set_charset("utf8");
 
-
 $result = $conn->query("SELECT * FROM documents ORDER BY title ASC");
 
-echo "<h2> المستندات المرتبة حسب العنوان</h2>";
+
+echo "<!DOCTYPE html>
+<html lang='ar'>
+<head>
+    <meta charset='UTF-8'>
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+            font-family: Arial, sans-serif;
+        }
+        ul {
+            list-style-type: disc;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>";
+
+echo "<h2>المستندات المرتبة حسب العنوان</h2>";
 echo "<ul>";
 
 while ($row = $result->fetch_assoc()) {
@@ -17,9 +41,11 @@ while ($row = $result->fetch_assoc()) {
 
     echo "<li>
             <a href='$file' target='_blank'>$title</a> 
-            ( $size_kb KB) -  <b>تصنيف:</b> $category
+            ( $size_kb KB) - <b>تصنيف:</b> $category
           </li>";
 }
 
-echo "</ul>";
+echo "</ul>
+</body>
+</html>";
 ?>
