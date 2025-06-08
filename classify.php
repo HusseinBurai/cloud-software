@@ -2,14 +2,12 @@
 $conn = new mysqli("localhost", "root", "", "cloud_db");
 $conn->set_charset("utf8");
 
-
 $categories = [
     "تعليم" => ["education", "student", "school", "university", "teacher"],
     "صحة" => ["health", "doctor", "hospital", "medicine", "clinic"],
     "اقتصاد" => ["economy", "money", "finance", "market", "business"],
     "تكنولوجيا" => ["computer", "software", "internet", "technology", "AI"]
 ];
-
 
 $result = $conn->query("SELECT id, content FROM documents");
 
@@ -32,14 +30,33 @@ while ($row = $result->fetch_assoc()) {
         }
     }
 
-    
     $stmt = $conn->prepare("UPDATE documents SET category = ? WHERE id = ?");
     $stmt->bind_param("si", $best_category, $id);
     $stmt->execute();
 }
 
 $conn->close();
-
-echo " تم تصنيف جميع المستندات تلقائيًا  .";
 ?>
 
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تصنيف المستندات</title>
+    <style>
+        body {
+            direction: rtl;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            margin-top: 50px;
+        }
+        .message {
+            font-size: 20px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">تم تصنيف جميع المستندات تلقائيًا بنجاح.</div>
+</body>
+</html>
