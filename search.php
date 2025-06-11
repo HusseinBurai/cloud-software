@@ -40,12 +40,11 @@
     </form>
 
     <?php
+    include("conn.php");  
+
     if (isset($_GET['q'])) {
         $q = trim($_GET['q']);
         $q_lower = strtolower($q);
-
-        $conn = new mysqli("localhost", "root", "", "cloud_db");
-        $conn->set_charset("utf8");
 
         $result = $conn->query("SELECT * FROM documents");
 
