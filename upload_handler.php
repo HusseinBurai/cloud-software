@@ -1,91 +1,51 @@
-<?php
-require 'vendor/autoload.php'; 
-
-use Smalot\PdfParser\Parser;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Element\Text;
-use PhpOffice\PhpWord\Element\TextRun;
-
-
-if (!isset($_FILES["doc"]) || $_FILES["doc"]["error"] !== UPLOAD_ERR_OK) {
-    die(" فشل في تحميل الملف.");
-}
-
-$target_dir = "uploads/";
-if (!is_dir($target_dir)) mkdir($target_dir);
-
-$filename = basename($_FILES["doc"]["name"]);
-$filename = preg_replace("/[^A-Za-z0-9_\-\.]/", '_', $filename);
-$target_file = $target_dir . $filename;
-
-$ext = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-$allowed = ['pdf', 'docx'];
-if (!in_array($ext, $allowed)) {
-    die(" نوع الملف غير مدعوم.");
-}
-
-
-if ($_FILES["doc"]["size"] > 5 * 1024 * 1024) {
-    die(" الملف أكبر من 5MB.");
-}
-
-
-move_uploaded_file($_FILES["doc"]["tmp_name"], $target_file);
-
-
-$title = "بدون عنوان";
-$content = "";
-
-if ($ext === "pdf") {
-    
-    $parser = new Parser();
-    $pdf = $parser->parseFile($target_file);
-    $text = $pdf->getText();
-    $lines = explode("\n", $text);
-    $title = trim($lines[0]);
-    $content = $text;
-
-} elseif ($ext === "docx") {
-    $phpWord = IOFactory::load($target_file);
-    $text = '';
-
-    foreach ($phpWord->getSections() as $section) {
-        $elements = $section->getElements();
-        foreach ($elements as $element) {
-            if ($element instanceof Text) {
-                $text .= $element->getText() . "\n";
-            } elseif ($element instanceof TextRun) {
-                foreach ($element->getElements() as $e) {
-                    if ($e instanceof Text) {
-                        $text .= $e->getText() . "\n";
-                    }
-                }
-            }
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload PDF or Word</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
         }
-    }
-
-    $lines = explode("\n", $text);
-    $title = trim($lines[0]);
-    $content = $text;
-}
-
-if (empty($content)) {
-    $title = pathinfo($target_file, PATHINFO_FILENAME);
-    $content = file_get_contents($target_file);
-}
-
-$size = filesize($target_file);
-
-
-$conn = new mysqli("localhost", "root", "", "cloud_db");
-$conn->set_charset("utf8mb4");
-
-$stmt = $conn->prepare("INSERT INTO documents (title, filename, content, size) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("sssi", $title, $target_file, $content, $size);
-$stmt->execute();
-$stmt->close();
-$conn->close();
-
-echo " تم رفع الملف وتخزينه بنجاح";
-
-?>
+        .upload-box {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .upload-box h2 {
+            margin-bottom: 20px;
+        }
+        .upload-box input[type="file"] {
+            margin-bottom: 20px;
+        }
+        .upload-box input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .upload-box input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-box">
+        <h2>رفع مستند PDF أو Word</h2>
+        <form action="upload_handler.php" method="POST" enctype="multipart/form-data">
+            <input type="file" name="doc" required><br>
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+</body>
+</html>
