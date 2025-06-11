@@ -1,8 +1,6 @@
 <?php
+include("conn.php");
 $start_time = microtime(true); 
-
-$conn = new mysqli("localhost", "root", "", "cloud_db");
-$conn->set_charset("utf8");
 
 $result = $conn->query("SELECT COUNT(*) as total_files, SUM(size) as total_size FROM documents");
 $data = $result->fetch_assoc();
