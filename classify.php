@@ -1,6 +1,5 @@
 <?php
-$conn = new mysqli("localhost", "root", "", "cloud_db");
-$conn->set_charset("utf8");
+include("conn.php"); 
 
 $categories = [
     "تعليم" => ["education", "student", "school", "university", "teacher"],
@@ -33,6 +32,7 @@ while ($row = $result->fetch_assoc()) {
     $stmt = $conn->prepare("UPDATE documents SET category = ? WHERE id = ?");
     $stmt->bind_param("si", $best_category, $id);
     $stmt->execute();
+    $stmt->close(); 
 }
 
 $conn->close();
