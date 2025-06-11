@@ -1,10 +1,7 @@
 <?php
-
-$conn = new mysqli("localhost", "root", "", "cloud_db");
-$conn->set_charset("utf8");
+include("conn.php");
 
 $result = $conn->query("SELECT * FROM documents ORDER BY title ASC");
-
 
 echo "<!DOCTYPE html>
 <html lang='ar'>
